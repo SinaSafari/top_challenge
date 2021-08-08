@@ -1,5 +1,4 @@
-import { openDB } from "../../../../lib/openDB"
-import { createNote, getAllNotes } from "../../../../lib/repositories/notes.repositories"
+import { createNote, getAllNotes } from "@/lib/repositories/notes.repositories"
 
 export default async function Notes(req, res) {
     if (req.method === "GET") {
@@ -9,9 +8,14 @@ export default async function Notes(req, res) {
         }
         return res.status(400).json(data)
 
-    } else if (req.method == "POST") {
+    }
+
+    else if (req.method == "POST") {
+
+        console.log(req.body)
 
         const { title, description } = req.body
+
         const data = await createNote({ title: title, description: description })
 
         if (data.success) {
@@ -19,7 +23,9 @@ export default async function Notes(req, res) {
         }
         return res.status(400).json(data)
 
-    } else {
+    }
+
+    else {
         return res.status(405).json({ success: false, message: "method not allowed", data: {} })
     }
 }

@@ -1,4 +1,4 @@
-import { openDB } from "../openDB"
+import { openDB } from "@/lib/openDB"
 
 /**
  * this method returns list of notes in the database.
@@ -7,7 +7,7 @@ import { openDB } from "../openDB"
 export async function getAllNotes() {
     try {
         const db = await openDB();
-        const notes = await db.exec("SELECT * FROM notes");
+        const notes = await db.all("SELECT * FROM notes");
         return {
             success: true,
             message: "all notes",
@@ -41,11 +41,12 @@ export async function getSingleNote(id) {
         }
 
         const db = await openDB();
-        const note = await db.exec("SELECT * FROM notes WHERE id = ?", [id]);
+        const stmt = `SELECT * FROM notes WHERE id = ${id}`
+        const note = await db.get(stmt);
         return {
             success: true,
             message: `single note with id ${id}`,
-            data: note,
+            data: note || {},
         };
 
     } catch (err) {
@@ -77,7 +78,7 @@ export async function createNote({ title, description = "description was not ent
             }
         }
         const db = await openDB();
-        await db.exec("INSERT INTO notes (title, description) VALUES(?, ?)", [title, description]);
+        await db.run("INSERT INTO notes (title, description) VALUES(?, ?)", title, description);
         const notes = await getAllNotes()
         return {
             success: true,
@@ -117,7 +118,9 @@ export async function updateSingleNote(id, title, description) {
         }
         const db = await openDB();
 
-        const note = await db.exec("UPDATE notes SET title = ?, description = ? WHERE id = ?", [title, description, id]);
+        const stmt = `UPDATE notes SET title = ${title}, description = ${description} WHERE id = ${id}`
+
+        const note = await db.exec(stmt);
 
         const notes = await getAllNotes()
         return {
@@ -154,7 +157,8 @@ export async function deleteNote(id) {
         }
 
         const db = await openDB();
-        await db.exec("DELETE FROM notes WHERE id = ?", [id]);
+        const stmt = `DELETE FROM notes WHERE id = ${id}`
+        await db.exec(stmt);
         const notes = await getAllNotes()
 
         return {

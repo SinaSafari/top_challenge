@@ -1,4 +1,4 @@
-import { openDB } from "../../../lib/openDB";
+import { openDB } from "@/lib/openDB";
 
 export default async function handler(req, res) {
   try {
